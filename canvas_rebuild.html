@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Canvas</title>
+  </head>
+  <body>
+    <canvas id="cvs" width="800" height="600" style="border: 1px solid black">
+    </canvas>
+    <script src="lib_rebuild.js"></script>
+    <script>
+      // 運用 new 呼叫類別中的建構函式，產生自訂的物件實體(實例方法、函式、Method)
+      let cvs = document.querySelector("#cvs"); // 取得 canvas 物件
+      cvs.addEventListener("click",function(e){
+        console.log(e.clientX,e.clientY); // 相對於整個畫面左上角的座標位置
+        console.log(e.offsetX,e.offsetY); // 相對於目標物 target (canvas畫布)內的座標位置
+        objs.push(new SmokeSystem(e.offsetX,e.offsetY)); // 將新創造出的冒火系統物件推進陣列裡
+      })
+      let ctx = cvs.getContext("2d"); // 取得對應的 context 物件
+      // ctx.fillRect(50, 50, 2, 2);
+      // 初始化資料
+      // let r1 = new Rect(50, 50, 1, 0);
+      // let r2 = new Rect(100, 100, 1, 1);
+      let objs = []; // 用陣列 objs 來裝所有要畫在畫面上的物件，原先的 r1、r2 也裝進陣列裡面
+      let refresh = function () {
+        // objs.push(new Smoke(400, 500));
+        // objs.push(new Rect(cvs.width / 2, cvs.height / 2)); // 每次執行 refresh(); 函式將參數 x,y 的值帶入建構函式 new Rect(); 中
+        // 函式 refresh 內部程式碼
+        // 更新資料 + 新增回收機制
+        for (let i = 0; i < objs.length; i++) {
+          // 巡迴陣列去更新陣列中所有狀態
+          let dead = objs[i].update();
+          /*
+            1. 呼叫 objs[i].update() 來更新物件的狀態（即改變物件的屬性或做其他處理）。
+            2. update() 函式執行後，返回一個布林值（true 或 false）。
+            3. 然後，將這個返回值指定給變數 dead，使得您可以用 dead 變數來判斷是否需要刪除該物件（例如，如果 dead 是 true，就刪除物件）。
+          */
+          if (dead === true) {
+            objs.splice(i, 1); // 拆分陣列，從第 i 個索引去除 1 個值
+            i--; // 同時索引 i 必須 -1，以確保下次 push [objs] 不會出錯
+          }
+          // r1.update();
+          // r2.update();
+          /*
+          1. r1.update(); 是指用 update(); 這個實例方法創建出新的物件 r1
+          2. update(r1);  是指用 update(); 這個函式用 r1 這個參數帶入
+        */
+          // 清空畫面
+          ctx.clearRect(0, 0, cvs.width, cvs.height); // 在座標 0,0 的位置，清除 "寬=畫布、高=畫布" 的方形
+          // 根據新的資料，重新畫過畫面
+          // r1.draw(); // 在 x1,50 的位置，填滿這個 2x2 的方形
+          // r2.draw(); // 在 x2,y2 的位置，填滿這個 2x2 的方形
+          for (let i = 0; i < objs.length; i++) {
+            objs[i].draw();
+          }
+        }
+      };
+      // 將原先應在 Smoke{}; 煙霧系統中的 draw(); 方法內執行的圖片載入工作提前至引擎這邊啟動
+      let img = new Image(); // 創建一個新的 Image 物件
+      img.src = "fire.png"; // 定義圖片物件來源
+      img.addEventListener("load", function () {
+        // 新增"load"的事件監聽器，當"load"事件發生，執行以下函式
+        window.setInterval(refresh, 10); // 引擎啟動，每10個毫秒(100hz)，執行函式 refresh 一次
+      });
+      // 運用 new 呼叫類別中的建構函式，產生自訂的物件實體(實例方法、函式、Method)
+    </script>
+  </body>
+</html>
